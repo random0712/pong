@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="Documents">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Documents/JOGL/JOGL_Linux/gluegen-rt-natives-linux-amd64.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/JOGL/JOGL_Linux/gluegen-rt.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/JOGL/JOGL_Linux/jogl-all.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/JOGL/JOGL_Linux/jogl-all-natives-linux-amd64.jar!/" />
+      <root url="file://$USER_HOME$/Documents" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Documents/JOGL/JOGL_Linux/gluegen-java-src.zip!/" />
+      <root url="jar://$USER_HOME$/Documents/JOGL/JOGL_Linux/jogl-java-src.zip!/" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/Documents" recursive="false" />
+  </library>
+</component>
