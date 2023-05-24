@@ -97,20 +97,18 @@ public class Cena implements GLEventListener, KeyListener {
     private Texture backgroundTexture;
 
     public void init(GLAutoDrawable drawable) {
-//        GL2 gl = drawable.getGL().getGL2();
-//        gl.glEnable(GL2.GL_DEPTH_TEST);
-//
-//        //Liga iluminacao
-//        gl.glEnable(GL2.GL_LIGHT0);
-//        gl.glEnable(GL2.GL_LIGHTING);
-//
-//        this.textura = new Textura(1);
-//
-//        //Habilita as cores do objeto 3D
-//        gl.glEnable(GL2.GL_COLOR_MATERIAL);
-//        gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
+    	GL2 gl = drawable.getGL().getGL2();
+        gl.glEnable(GL2.GL_DEPTH_TEST);
 
-        GL2 gl = drawable.getGL().getGL2();
+        //Liga iluminacao
+        gl.glEnable(GL2.GL_LIGHT1);
+        gl.glEnable(GL2.GL_LIGHTING);
+
+        this.textura = new Textura(1);
+
+        //Habilita as cores do objeto 3D
+        gl.glEnable(GL2.GL_COLOR_MATERIAL);
+        gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
 
         gl.glEnable(GL2.GL_DEPTH_TEST); // Habilita o teste de profundidade
         gl.glDepthFunc(GL2.GL_LEQUAL); // Define a função de teste de profundidade
@@ -128,58 +126,37 @@ public class Cena implements GLEventListener, KeyListener {
     }
 
     public void display(GLAutoDrawable drawable) {
-        // obtem o contexto Opengl
         GL2 gl = drawable.getGL().getGL2();
-        // define a cor da janela (R, G, G, alpha)
-        gl.glClearColor(0, 0, 0, 1);
+        // define a cor da janela (R, G, B, alpha)
+        gl.glColor3f(1.0f,1.0f,1.0f);
 
-//        gl.glOrtho(0, 100, 0, 100, -1, 1);
         GLUT glut = new GLUT();
+        
 //
         // limpa a janela com a cor especificada
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-//        gl.glLoadIdentity(); // lê a matriz identidade
-
-//        GL2 gl = drawable.getGL().getGL2();
-//        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-//
-//        gl.glMatrixMode(GL2.GL_PROJECTION);
+        
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-        gl.glOrtho(0, 800, 0, 600, -1, 1);
-//
-//        gl.glMatrixMode(GL2.GL_MODELVIEW);
-//        gl.glLoadIdentity();
-//
+        gl.glOrtho(-1, 1, -1, 1, -1, 1);
+        
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+
         // Desenhar um quadrado preenchendo toda a janela
         gl.glEnable(GL2.GL_TEXTURE_2D);
         backgroundTexture.bind(gl);
         gl.glBegin(GL2.GL_QUADS);
         gl.glTexCoord2f(0, 0);
-        gl.glVertex2f(0, 0);
+        gl.glVertex2f(-1, -1);
         gl.glTexCoord2f(1, 0);
-        gl.glVertex2f(800, 0);
+        gl.glVertex2f(1, -1);
         gl.glTexCoord2f(1, 1);
-        gl.glVertex2f(800, 600);
+        gl.glVertex2f(1, 1);
         gl.glTexCoord2f(0, 1);
-        gl.glVertex2f(0, 600);
+        gl.glVertex2f(-1, 1);
         gl.glEnd();
         gl.glDisable(GL2.GL_TEXTURE_2D);
-
-//        // Desenhar um quadrado preenchendo toda a janela
-//        gl.glEnable(GL2.GL_TEXTURE_2D);
-//        backgroundTexture.bind(gl);
-//        gl.glBegin(GL2.GL_QUADS);
-//        gl.glTexCoord2f(0, 0);
-//        gl.glVertex2f(0, 0);
-//        gl.glTexCoord2f(1, 0);
-//        gl.glVertex2f(100, 0);
-//        gl.glTexCoord2f(1, 1);
-//        gl.glVertex2f(100, 100);
-//        gl.glTexCoord2f(0, 1);
-//        gl.glVertex2f(0, 100);
-//        gl.glEnd();
-//        gl.glDisable(GL2.GL_TEXTURE_2D);
+    
 
         switch (opcao) {
             case 2:
@@ -431,6 +408,12 @@ public class Cena implements GLEventListener, KeyListener {
     }
 
     public void desenhaVida(GL2 gl, GLUT glut, float incr) {
+
+        if (SPHERE > 0.030f) {
+            SPHERE = 0.022f;
+            CONE = 0.05f;
+        }
+
         gl.glPopMatrix();
 
         gl.glPushMatrix();
