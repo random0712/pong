@@ -10,7 +10,7 @@ public class Menu {
     private TextRenderer textRenderer;
 
     private void desenhaTexto(int xPosicao, int yPosicao, Color cor, String frase, int size) {
-        textRenderer = new TextRenderer(new Font("Arial Negrito", Font.PLAIN, size));
+    	textRenderer = new TextRenderer(new Font("Roboto", Font.PLAIN, size));
         textRenderer.beginRendering(Renderer.screenWidth, Renderer.screenHeight);
         textRenderer.setColor(cor);
         textRenderer.draw(frase, xPosicao, yPosicao);
@@ -18,7 +18,7 @@ public class Menu {
     }
 
     public void jogo(String frase) {
-        this.desenhaTexto(15, 560, Color.BLUE, frase, 15);
+        this.desenhaTexto(15, 560, Color.WHITE, frase, 15);
     }
 
     public void segundaFase() {
@@ -26,7 +26,7 @@ public class Menu {
     }
 
     public void pontos(int pontos) {
-        this.desenhaTexto(280, 555, Color.BLUE, pontos+"", 20);
+        this.desenhaTexto(280, 555, Color.RED, pontos+"", 20);
     }
 
     public void pause() {
