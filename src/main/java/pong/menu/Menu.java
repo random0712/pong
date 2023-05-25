@@ -18,26 +18,30 @@ public class Menu {
     }
 
     public void jogo(String frase) {
-        this.desenhaTexto(15, 560, Color.WHITE, frase, 15);
+        this.desenhaTexto(15, 560, Color.BLACK, frase, 25);
+    }
+    
+    public void start() {
+        this.desenhaTexto(140, 300, Color.LIGHT_GRAY, "Aperte Enter para começar", 30);
     }
 
     public void segundaFase() {
-        this.desenhaTexto(160, 300, Color.PINK, "Segunda Fase", 40);
+        this.desenhaTexto(160, 300, Color.LIGHT_GRAY, "Segunda Fase", 40);
     }
 
     public void pontos(int pontos) {
-        this.desenhaTexto(280, 555, Color.RED, pontos+"", 20);
+        this.desenhaTexto(280, 555, Color.YELLOW, pontos+"", 30);
     }
 
     public void pause() {
-        this.desenhaTexto(225, 300, Color.PINK, "PAUSE", 40);
+        this.desenhaTexto(225, 300, Color.BLUE, "PAUSE", 40);
     }
 
     public void gameOver() {
-        this.desenhaTexto(175, 300, Color.PINK, "Você Perdeu :(", 40);
+        this.desenhaTexto(175, 300, Color.RED, "Você Perdeu :(", 40);
     }
 
     public void venceu() {
-        this.desenhaTexto(175, 300, Color.PINK, "Você venceu!", 40);
+        this.desenhaTexto(175, 300, Color.GREEN, "Você venceu!", 40);
     }
 }
