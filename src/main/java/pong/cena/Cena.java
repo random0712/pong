@@ -17,13 +17,13 @@ import java.io.IOException;
 
 public class Cena implements GLEventListener, KeyListener {
     private Menu menu;
-    private Textura textura = null;
-
     public static final String IMG_TEXTURA = "src/imagens/fundo.jpg";
 
     private int opcao = 0;
     private boolean INICIO = true;
-    private boolean PAUSE = false;
+    private boolean PAUSE = true;
+    
+    public int tonalizacao = GL2.GL_SMOOTH; 
 
     private int PONTUACAO_ATUAL = 0;
     public static int PONTUACAO_FASE_2 = 200;
@@ -84,16 +84,6 @@ public class Cena implements GLEventListener, KeyListener {
 
     private float POSICAO_VIDA_Z = 0.3f;
 
-    private float POSICAO_VIDA_DIR_X = 0.525f;
-    private float POSICAO_VIDA_DIR_Y = 0.9f;
-
-    private float POSICAO_VIDA_BASE_X = (POSICAO_VIDA_ESQ_X + POSICAO_VIDA_DIR_X) / 2;
-    private float POSICAO_VIDA_BASE_Y = 0.3f;
-    private float POSICAO_VIDA_BASE_Z = -0.89f;
-
-    private float SPHERE = 0.022f;
-    private float CONE = 0.05f;
-
     private Texture backgroundTexture;
 
     public void init(GLAutoDrawable drawable) {
@@ -101,10 +91,10 @@ public class Cena implements GLEventListener, KeyListener {
         gl.glEnable(GL2.GL_DEPTH_TEST);
 
         //Liga iluminacao
-        gl.glEnable(GL2.GL_LIGHT1);
-        gl.glEnable(GL2.GL_LIGHTING);
+//        gl.glEnable(GL2.GL_LIGHT1);
+//        gl.glEnable(GL2.GL_LIGHTING);
 
-        this.textura = new Textura(1);
+        new Textura(1);
 
         //Habilita as cores do objeto 3D
         gl.glEnable(GL2.GL_COLOR_MATERIAL);
@@ -114,7 +104,7 @@ public class Cena implements GLEventListener, KeyListener {
         gl.glDepthFunc(GL2.GL_LEQUAL); // Define a função de teste de profundidade
 
         try {
-            File imageFile = new File("src/imagens/fundo.jpg"); // Caminho da imagem de fundo
+            File imageFile = new File("pong-feature-fundo/src/imagens/tennis.jpg"); // Caminho da imagem de fundo
             backgroundTexture = TextureIO.newTexture(imageFile, true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -159,8 +149,11 @@ public class Cena implements GLEventListener, KeyListener {
     
 
         switch (opcao) {
+	        case 0:
+	            this.menu = new Menu();
+	            this.menu.start();
+	            break;
             case 2:
-            case 0:
                 this.menu = new Menu();
                 double lim = 2 * Math.PI;
 
@@ -341,11 +334,36 @@ public class Cena implements GLEventListener, KeyListener {
                 if (DESCER_RETO) {
                     this.descerReto(gl);
                 }
+                gl.glEnable(GL2.GL_LIGHTING);
+                gl.glEnable(GL2.GL_LIGHT0);
+                gl.glEnable(GL2.GL_COLOR_MATERIAL);
+                
+//                Defina a posição da fonte de luz:
+                	float[] lightPosition = {1, 1, 0.0f, 1.0f}; // Posição da luz no centro da bola (z = 0)
+                	gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition, 0);
 
+//                	Defina as propriedades do material para a bola:
+
+                	float[] ambient = {0.2f, 0.2f, 0.2f, 1.0f};
+                	float[] diffuse = {1.0f, 0.0f, 0.0f, 1.0f};
+                	float[] specular = {1.0f, 1.0f, 1.0f, 1.0f};
+                	float shininess = 10.0f;
+
+                	gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, ambient, 0);
+                	gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, diffuse, 0);
+                	gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, specular, 0);
+                	gl.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, shininess);
+                
+                
                 gl.glBegin(GL2.GL_POLYGON);
-                gl.glColor3f(1, 0, 0);
+                gl.glColor3f(1, 1, 0);
                 for (float i = 0; i < lim; i += 0.01) {
-                    gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
+//                    gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
+                	  float normalX = (float) Math.cos(i); // Normal x (mesmo que o raio)
+                	    float normalY = (float) Math.sin(i); // Normal y (mesmo que o raio)
+
+                	    gl.glNormal3f(normalX, normalY, 0.0f); // Especifica a normal do vértice
+                	    gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
                 }
 
                 gl.glEnd();
@@ -353,7 +371,6 @@ public class Cena implements GLEventListener, KeyListener {
 
                 //BASTAO
                 gl.glPushMatrix();
-
                 gl.glColor3f(0.8f, 0.8f, 0.8f);
                 gl.glTranslatef(MOVE_BASTAO_X, 0, 0);
                 gl.glBegin(GL2.GL_QUADS);
@@ -369,7 +386,7 @@ public class Cena implements GLEventListener, KeyListener {
                 if (PONTUACAO_ATUAL >= PONTUACAO_FASE_2) {
                     // BASTAO 2
                     gl.glPushMatrix();
-                    gl.glColor3f(0.5f, 0, 0);
+                    gl.glColor3f(1, 1, 1);
                     gl.glBegin(GL2.GL_QUADS);
                     gl.glVertex2d(BASTAO_2_X1, BASTAO_2_Y1);
                     gl.glVertex2d(BASTAO_2_X2, BASTAO_2_Y1);
@@ -408,34 +425,41 @@ public class Cena implements GLEventListener, KeyListener {
     }
 
     public void desenhaVida(GL2 gl, GLUT glut, float incr) {
-
-        if (SPHERE > 0.030f) {
-            SPHERE = 0.022f;
-            CONE = 0.05f;
-        }
-
-        gl.glPopMatrix();
-
         gl.glPushMatrix();
-        gl.glColor3f(1, 1, 1);
+        gl.glColor3f(1, 1, 1); // Cor branca para a vida
+
+        // Desenhar o corpo da vida (cogumelo)
+        gl.glPushMatrix();
         gl.glTranslatef(POSICAO_VIDA_ESQ_X + incr, POSICAO_VIDA_ESQ_Y, POSICAO_VIDA_Z);
 
-        glut.glutSolidSphere(SPHERE, 10, 10);
+        float tamanho = 0.15f;
+
+        gl.glBegin(GL2.GL_POLYGON);
+        gl.glVertex2f(-0.3f * tamanho, 0);
+        gl.glVertex2f(0.3f * tamanho, 0);
+        gl.glVertex2f(0.3f * tamanho, tamanho);
+        gl.glVertex2f(0, tamanho * 2);
+        gl.glVertex2f(-0.3f * tamanho, tamanho);
+        gl.glEnd();
+
         gl.glPopMatrix();
 
+        // Desenhar os olhos da vida (pontos pretos)
         gl.glPushMatrix();
-        gl.glTranslatef(POSICAO_VIDA_DIR_X + incr, POSICAO_VIDA_DIR_Y, POSICAO_VIDA_Z);
-        glut.glutSolidSphere(SPHERE, 10, 10);
+        gl.glTranslatef(POSICAO_VIDA_ESQ_X + incr, POSICAO_VIDA_ESQ_Y + tamanho * 1.3f, POSICAO_VIDA_Z);
+
+        float tamanhoOlho = tamanho * 0.2f;
+
+        gl.glColor3f(0, 0, 0); // Cor preta para os olhos
+
+        glut.glutSolidSphere(tamanhoOlho, 10, 10);
+
+        gl.glTranslatef(tamanho * 0.3f, 0, 0);
+        glut.glutSolidSphere(tamanhoOlho, 10, 10);
+
         gl.glPopMatrix();
 
-        gl.glPushMatrix();
-        gl.glRotated(90, 1, 0, 0);
-        gl.glTranslatef(POSICAO_VIDA_BASE_X + incr, POSICAO_VIDA_BASE_Y, POSICAO_VIDA_BASE_Z);
-        glut.glutSolidCone(CONE-0.02f, CONE, 10, 10);
         gl.glPopMatrix();
-
-        gl.glPopMatrix();
-
     }
 
     private void subirDireita(GL2 gl) {
@@ -663,7 +687,40 @@ public class Cena implements GLEventListener, KeyListener {
                 break;
         }
     }
+    
+    public void iluminacaoEspecular(GL2 gl){        
+        float luzAmbiente[] = {0.2f, 0.2f, 0.2f, 1.0f}; //cor
+        float luzEspecular[]={1.0f, 1.0f, 1.0f, 1.0f}; //cor
+        float posicaoLuz[]={-50.f, 0.0f, 100.0f, 1.0f}; //pontual
+             
+        //intensidade da reflexao do material        
+        int especMaterial = 128;
+        //define a concentracao do brilho
+    	gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, especMaterial);
 
+    	//define a reflect�ncia do material
+    	gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, luzEspecular, 0);
+
+        //define os par�metros de luz de n�mero 0 (zero)
+    	gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, luzAmbiente, 0);
+    	gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, luzEspecular, 0);
+    	gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, posicaoLuz, 0);
+    }
+    
+    public void ligaLuz(GL2 gl) {
+        // habilita a defini��o da cor do material a partir da cor corrente
+        gl.glEnable(GL2.GL_COLOR_MATERIAL);
+
+        // habilita o uso da ilumina��o na cena
+        gl.glEnable(GL2.GL_LIGHTING);
+        // habilita a luz de n�mero 0
+        gl.glEnable(GL2.GL_LIGHT0);
+        //Especifica o Modelo de tonalizacao a ser utilizado 
+        //GL_FLAT -> modelo de tonalizacao flat 
+        //GL_SMOOTH -> modelo de tonaliza��o GOURAUD (default)        
+        gl.glShadeModel(tonalizacao);
+    }
+    
     public void keyReleased(KeyEvent e) {
     }
 }
