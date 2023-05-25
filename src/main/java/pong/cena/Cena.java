@@ -104,7 +104,7 @@ public class Cena implements GLEventListener, KeyListener {
         gl.glDepthFunc(GL2.GL_LEQUAL); // Define a função de teste de profundidade
 
         try {
-            File imageFile = new File("pong-feature-fundo/src/imagens/tennis.jpg"); // Caminho da imagem de fundo
+            File imageFile = new File("src/imagens/tennis.jpg"); // Caminho da imagem de fundo
             backgroundTexture = TextureIO.newTexture(imageFile, true);
         } catch (IOException e) {
             e.printStackTrace();
