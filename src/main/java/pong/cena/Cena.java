@@ -2,13 +2,13 @@ package pong.cena;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
+import pong.enums.MovimentoObstaculo;
 import pong.menu.Menu;
 import pong.textura.Textura;
 
@@ -17,8 +17,6 @@ import java.io.IOException;
 
 public class Cena implements GLEventListener, KeyListener {
     private Menu menu;
-    public static final String IMG_TEXTURA = "src/imagens/fundo.jpg";
-
     private int opcao = 0;
     private boolean INICIO = true;
     private boolean PAUSE = true;
@@ -49,12 +47,11 @@ public class Cena implements GLEventListener, KeyListener {
     private float MOVE_BASTAO_X = 0;
 
     private float BASTAO_CENTRO = 0;
-    private float BASTAO_2_CENTRO = 0;
 
-    private float BASTAO_2_X1 = .05f;
-    private float BASTAO_2_X2 = .05f;
-    private float BASTAO_2_Y1 = .6f;
-    private float BASTAO_2_Y2 = -.1f;
+    private float BASTAO_2_X1 = -0.2f;
+    private float BASTAO_2_X2 = 0.2f;
+    private final float BASTAO_2_Y1 = 1f;
+    private final float BASTAO_2_Y2 = 0.9f;
 
     private float BASTAO_2_PONTA_ESQUERDA = BASTAO_2_X1;
     private float BASTAO_2_PONTA_DIREITA = BASTAO_2_X2;
@@ -77,22 +74,15 @@ public class Cena implements GLEventListener, KeyListener {
     private boolean DESCER_DIREITA = false;
     private boolean DESCER_ESQUERDA = false;
 
+    private MovimentoObstaculo movimentoObstaculo = MovimentoObstaculo.DIREITA;
+
     public static int VIDAS = 5;
-
-    private float POSICAO_VIDA_ESQ_X = 0.5f;
-    private float POSICAO_VIDA_ESQ_Y = 0.9f;
-
-    private float POSICAO_VIDA_Z = 0.3f;
 
     private Texture backgroundTexture;
 
     public void init(GLAutoDrawable drawable) {
     GL2 gl = drawable.getGL().getGL2();
         gl.glEnable(GL2.GL_DEPTH_TEST);
-
-        //Liga iluminacao
-//        gl.glEnable(GL2.GL_LIGHT1);
-//        gl.glEnable(GL2.GL_LIGHTING);
 
         new Textura(1);
 
@@ -146,124 +136,38 @@ public class Cena implements GLEventListener, KeyListener {
         gl.glVertex2f(-1, 1);
         gl.glEnd();
         gl.glDisable(GL2.GL_TEXTURE_2D);
-   
 
+        System.out.println(opcao);
         switch (opcao) {
-       case 0:
-           this.menu = new Menu();
-           this.menu.start();
-           break;
+            case 0:
+               this.menu = new Menu();
+               this.menu.start();
+               break;
             case 2:
                 this.menu = new Menu();
-                double lim = 2 * Math.PI;
 
                 gl.glPushMatrix();
-
-                if (INICIO) {
-                    this.gameOver();
-                    this.inicio(gl);
-                }
                 this.gameOver();
 
-                if (PONTUACAO_ATUAL >= PONTUACAO_FASE_2) {
-                    this.menu.jogo("Segunda Fase");
-                } else {
-                    this.menu.jogo("Primeira Fase");
-                }
 
-                if (PONTUACAO_ATUAL == PONTUACAO_FASE_2 && FASE_2) {
-                    opcao = 5;
-                    this.reset(false);
-                    FASE_2 = false;
-                    DESCER_RETO = true;
+                if (INICIO) {
+                    this.inicio(gl);
                 }
 
                 POSICAO_BOLA_Y = -(cY + rY) + MOVE_Y;
                 POSICAO_BOLA_X = -(cX + rX) + MOVE_X;
 
+
+
+                if (PONTUACAO_ATUAL == PONTUACAO_FASE_2 && FASE_2) {
+                    iniciarFase2();
+                }
+
                 if (PONTUACAO_ATUAL >= PONTUACAO_FASE_2) {
-                    VELOCIDADE = 0.015f;
-
-                    BASTAO_2_CENTRO = (BASTAO_2_PONTA_ESQUERDA + BASTAO_2_PONTA_DIREITA) / 2;
-                    float BOLA_X = (POSICAO_BOLA_X + rX);
-                    float BASTAO_Y2 = (BASTAO_2_Y2 - 0.3f);
-
-                    if (SUBIR_DIREITA || SUBIR_ESQUERDA || SUBIR_RETO) {
-
-                        BASTAO_2_X1 = -0.2f;
-                        BASTAO_2_X2 = 0.2f;
-
-                        BASTAO_2_PONTA_ESQUERDA = BASTAO_2_X1;
-                        BASTAO_2_PONTA_DIREITA = BASTAO_2_X2;
-                        gl.glBegin(GL2.GL_QUADS);
-                        gl.glVertex2d(BASTAO_2_X1, BASTAO_2_Y1);
-                        gl.glVertex2d(BASTAO_2_X2, BASTAO_2_Y1);
-                        gl.glVertex2d(BASTAO_2_X2, BASTAO_2_Y2);
-                        gl.glVertex2d(BASTAO_2_X1, BASTAO_2_Y2);
-                        gl.glEnd();
-
-                        if (POSICAO_BOLA_Y >= BASTAO_Y2 && POSICAO_BOLA_Y < BASTAO_2_Y1
-                                && BOLA_X >= BASTAO_2_PONTA_ESQUERDA
-                                && BOLA_X <= BASTAO_2_PONTA_DIREITA) {
-
-
-                            if (POSICAO_BOLA_X == -rX || POSICAO_BOLA_X == BASTAO_2_CENTRO && SUBIR_RETO) {
-                                DESCER_RETO = true;
-                                SUBIR_ESQUERDA = false;
-                                SUBIR_DIREITA = false;
-                                SUBIR_RETO = false;
-                            }
-
-                            if (SUBIR_ESQUERDA) {
-                                DESCER_ESQUERDA = true;
-                                SUBIR_ESQUERDA = false;
-                                SUBIR_DIREITA = false;
-                                SUBIR_RETO = false;
-                            }
-                            if (SUBIR_DIREITA) {
-                                DESCER_DIREITA = true;
-                                SUBIR_ESQUERDA = false;
-                                SUBIR_DIREITA = false;
-                                SUBIR_RETO = false;
-                            }
-                        }
-                    }
-
-                    if (DESCER_DIREITA || DESCER_ESQUERDA) {
-
-                        BASTAO_2_X1 = -0.3f;
-                        BASTAO_2_X2 = 0.3f;
-
-                        BASTAO_2_PONTA_ESQUERDA = BASTAO_2_X1;
-                        BASTAO_2_PONTA_DIREITA = BASTAO_2_X2;
-
-                        if (POSICAO_BOLA_Y <= BASTAO_2_Y1 && POSICAO_BOLA_Y > BASTAO_2_Y2
-                                && BOLA_X >= BASTAO_2_PONTA_ESQUERDA
-                                && BOLA_X <= BASTAO_2_PONTA_DIREITA) {
-
-
-                            if (DESCER_DIREITA) {
-                                SUBIR_DIREITA = true;
-                                DESCER_RETO = false;
-                                DESCER_ESQUERDA = false;
-                                DESCER_DIREITA = false;
-                            }
-                            if (DESCER_ESQUERDA) {
-                                SUBIR_ESQUERDA = true;
-                                DESCER_RETO = false;
-                                DESCER_ESQUERDA = false;
-                                DESCER_DIREITA = false;
-                            }
-                        }
-                    }
-
-                    if (PONTUACAO_ATUAL == PONTOS_PARA_VENCER) {
-                        opcao = 6;
-                        this.reset(true);
-                        PONTUACAO_ATUAL = 0;
-                        VIDAS = 5;
-                        FASE_2 = true;
-                    }
+                    this.menu.jogo("Segunda Fase");
+                    configurarFase2();
+                } else {
+                    this.menu.jogo("Primeira Fase");
                 }
 
 
@@ -340,72 +244,15 @@ public class Cena implements GLEventListener, KeyListener {
                 if (DESCER_RETO) {
                     this.descerReto(gl);
                 }
-                gl.glEnable(GL2.GL_LIGHTING);
-                gl.glEnable(GL2.GL_LIGHT0);
-                gl.glEnable(GL2.GL_COLOR_MATERIAL);
-               
-//                Defina a posição da fonte de luz:
-                float[] lightPosition = {1, 1, 0.0f, 1.0f}; // Posição da luz no centro da bola (z = 0)
-                gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition, 0);
 
-//                 Defina as propriedades do material para a bola:
-
-                float[] ambient = {0.2f, 0.2f, 0.2f, 1.0f};
-                float[] diffuse = {1.0f, 0.0f, 0.0f, 1.0f};
-                float[] specular = {1.0f, 1.0f, 1.0f, 1.0f};
-                float shininess = 10.0f;
-
-                gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, ambient, 0);
-                gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, diffuse, 0);
-                gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, specular, 0);
-                gl.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, shininess);
-               
-               
-                gl.glBegin(GL2.GL_POLYGON);
-                gl.glColor3f(1, 1, 0);
-                for (float i = 0; i < lim; i += 0.01) {
-//                    gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
-                 float normalX = (float) Math.cos(i); // Normal x (mesmo que o raio)
-                   float normalY = (float) Math.sin(i); // Normal y (mesmo que o raio)
-
-                   gl.glNormal3f(normalX, normalY, 0.0f); // Especifica a normal do vértice
-                   gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
-                }
-
-                gl.glEnd();
-                gl.glPopMatrix();
-
-                //BASTAO
-                gl.glPushMatrix();
-                gl.glColor3f(0.8f, 0.8f, 0.8f);
-                gl.glTranslatef(MOVE_BASTAO_X, 0, 0);
-                gl.glBegin(GL2.GL_QUADS);
-                gl.glVertex2d(BASTAO_X1, BASTAO_Y1);
-                gl.glVertex2d(BASTAO_X2, BASTAO_Y1);
-                gl.glVertex2d(BASTAO_X2, BASTAO_Y2);
-                gl.glVertex2d(BASTAO_X1, BASTAO_Y2);
-
-
-                gl.glEnd();
-                gl.glPopMatrix();
+                desenhaBola(gl);
+                desenhaBastao(gl);
 
                 if (PONTUACAO_ATUAL >= PONTUACAO_FASE_2) {
-                    // BASTAO 2
-                    gl.glPushMatrix();
-                    gl.glColor3f(1, 1, 1);
-                    gl.glBegin(GL2.GL_QUADS);
-                    gl.glVertex2d(BASTAO_2_X1, BASTAO_2_Y2);
-                    gl.glVertex2d(BASTAO_2_X2, BASTAO_2_Y2);
-                    gl.glVertex2d(BASTAO_2_X2, BASTAO_2_Y1);
-                    gl.glVertex2d(BASTAO_2_X1, BASTAO_2_Y1);
-                    gl.glEnd();
-                    gl.glPopMatrix();
+                    desenhaObstaculo(gl);
                 }
-                float incr = 0;
-                for (int i = 0; i < VIDAS; i += 1) {
-                    desenhaVida(gl, glut, incr);
-                    incr += 0.1f;
-                }
+
+                desenharVidas(gl, glut);
                 this.menu.pontos(PONTUACAO_ATUAL);
                 break;
             case 3:
@@ -417,6 +264,7 @@ public class Cena implements GLEventListener, KeyListener {
                 this.menu.gameOver();
                 break;
             case 5:
+                this.menu.jogo("Segunda Fase");
                 this.menu = new Menu();
                 this.menu.segundaFase();
                 break;
@@ -429,12 +277,183 @@ public class Cena implements GLEventListener, KeyListener {
         gl.glFlush();
     }
 
+    private void configurarFase2() {
+        VELOCIDADE = 0.015f;
+
+        float BASTAO_2_CENTRO = (BASTAO_2_PONTA_ESQUERDA + BASTAO_2_PONTA_DIREITA) / 2;
+        float BOLA_X = (POSICAO_BOLA_X + rX);
+        float BASTAO_Y2 = (BASTAO_2_Y2 - 0.2f);
+
+        if (SUBIR_DIREITA || SUBIR_ESQUERDA || SUBIR_RETO) {
+
+            if (POSICAO_BOLA_Y >= BASTAO_Y2 && POSICAO_BOLA_Y < BASTAO_2_Y1
+                    && BOLA_X >= BASTAO_2_PONTA_ESQUERDA
+                    && BOLA_X <= BASTAO_2_PONTA_DIREITA) {
+
+
+                if (POSICAO_BOLA_X == -rX || POSICAO_BOLA_X == BASTAO_2_CENTRO && SUBIR_RETO) {
+                    DESCER_RETO = true;
+                    SUBIR_ESQUERDA = false;
+                    SUBIR_DIREITA = false;
+                    SUBIR_RETO = false;
+                }
+
+                if (SUBIR_ESQUERDA) {
+                    DESCER_ESQUERDA = true;
+                    SUBIR_ESQUERDA = false;
+                    SUBIR_DIREITA = false;
+                    SUBIR_RETO = false;
+                }
+                if (SUBIR_DIREITA) {
+                    DESCER_DIREITA = true;
+                    SUBIR_ESQUERDA = false;
+                    SUBIR_DIREITA = false;
+                    SUBIR_RETO = false;
+                }
+            }
+        }
+
+        if (DESCER_DIREITA || DESCER_ESQUERDA) {
+
+            BASTAO_2_PONTA_ESQUERDA = BASTAO_2_X1;
+            BASTAO_2_PONTA_DIREITA = BASTAO_2_X2;
+
+            if (POSICAO_BOLA_Y <= BASTAO_2_Y1 && POSICAO_BOLA_Y > BASTAO_2_Y2
+                    && BOLA_X >= BASTAO_2_PONTA_ESQUERDA
+                    && BOLA_X <= BASTAO_2_PONTA_DIREITA) {
+
+
+                if (DESCER_DIREITA) {
+                    SUBIR_DIREITA = true;
+                    DESCER_RETO = false;
+                    DESCER_ESQUERDA = false;
+                    DESCER_DIREITA = false;
+                }
+                if (DESCER_ESQUERDA) {
+                    SUBIR_ESQUERDA = true;
+                    DESCER_RETO = false;
+                    DESCER_ESQUERDA = false;
+                    DESCER_DIREITA = false;
+                }
+            }
+        }
+
+        if (PONTUACAO_ATUAL == PONTOS_PARA_VENCER) {
+            opcao = 6;
+            this.reset(true);
+            PONTUACAO_ATUAL = 0;
+            VIDAS = 5;
+            FASE_2 = true;
+        }
+    }
+
+    private void iniciarFase2() {
+        opcao = 5;
+        this.reset(false);
+        FASE_2 = false;
+        DESCER_RETO = true;
+    }
+
+    private void desenhaBola(GL2 gl) {
+        gerarIluminacao(gl);
+        gl.glBegin(GL2.GL_POLYGON);
+        gl.glColor3f(1, 1, 0);
+
+        double lim = 2 * Math.PI;
+        for (float i = 0; i < lim; i += 0.01) {
+           float normalX = (float) Math.cos(i); // Normal x (mesmo que o raio)
+           float normalY = (float) Math.sin(i); // Normal y (mesmo que o raio)
+
+           gl.glNormal3f(normalX, normalY, 0.0f); // Especifica a normal do vértice
+           gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
+        }
+
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
+
+    private static void gerarIluminacao(GL2 gl) {
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_LIGHT0);
+        gl.glEnable(GL2.GL_COLOR_MATERIAL);
+
+//                Defina a posição da fonte de luz:
+        float[] lightPosition = {1, 1, 0.0f, 1.0f}; // Posição da luz no centro da bola (z = 0)
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition, 0);
+
+//                 Defina as propriedades do material para a bola:
+
+
+        float[] ambient = {0.2f, 0.2f, 0.2f, 1.0f};
+        float[] diffuse = {1.0f, 0.0f, 0.0f, 1.0f};
+        float[] specular = {1.0f, 1.0f, 1.0f, 1.0f};
+        float shininess = 10.0f;
+
+        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, ambient, 0);
+        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, diffuse, 0);
+        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, specular, 0);
+        gl.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, shininess);
+    }
+
+    private void desenhaBastao(GL2 gl) {
+        gl.glPushMatrix();
+        gl.glColor3f(0.8f, 0.8f, 0.8f);
+        gl.glTranslatef(MOVE_BASTAO_X, 0, 0);
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glVertex2d(BASTAO_X1, BASTAO_Y1);
+        gl.glVertex2d(BASTAO_X2, BASTAO_Y1);
+        gl.glVertex2d(BASTAO_X2, BASTAO_Y2);
+        gl.glVertex2d(BASTAO_X1, BASTAO_Y2);
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
+
+    private void desenharVidas(GL2 gl, GLUT glut) {
+        float incr = 0;
+        for (int i = 0; i < VIDAS; i += 1) {
+            desenhaVida(gl, glut, incr);
+            incr += 0.1f;
+        }
+    }
+
+    private void desenhaObstaculo(GL2 gl) {
+        if(BASTAO_2_X2 >= LIMITE_DIREITA) {
+            movimentoObstaculo = MovimentoObstaculo.ESQUERDA;
+        }
+
+        if(BASTAO_2_X1 <= LIMITE_ESQUERDA) {
+            movimentoObstaculo = MovimentoObstaculo.DIREITA;
+        }
+
+        float deslocamentoX = movimentoObstaculo == MovimentoObstaculo.DIREITA
+                ? 0.01f
+                : -0.01f;
+
+        BASTAO_2_X1 += deslocamentoX;
+        BASTAO_2_X2 += deslocamentoX;
+
+        BASTAO_2_PONTA_ESQUERDA = BASTAO_2_X1;
+        BASTAO_2_PONTA_DIREITA = BASTAO_2_X2;
+
+        gl.glPushMatrix();
+        gl.glColor3f(1, 1, 1);
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glVertex2d(BASTAO_2_X1, BASTAO_2_Y2);
+        gl.glVertex2d(BASTAO_2_X2, BASTAO_2_Y2);
+        gl.glVertex2d(BASTAO_2_X2, BASTAO_2_Y1);
+        gl.glVertex2d(BASTAO_2_X1, BASTAO_2_Y1);
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
+
     public void desenhaVida(GL2 gl, GLUT glut, float incr) {
         gl.glPushMatrix();
         gl.glColor3f(1, 1, 1); // Cor branca para a vida
 
-        // Desenhar o corpo da vida (cogumelo)
         gl.glPushMatrix();
+        float POSICAO_VIDA_ESQ_X = 0.5f;
+        float POSICAO_VIDA_ESQ_Y = 0.9f;
+        float POSICAO_VIDA_Z = 0.3f;
         gl.glTranslatef(POSICAO_VIDA_ESQ_X + incr, POSICAO_VIDA_ESQ_Y, POSICAO_VIDA_Z);
 
         float tamanho = 0.15f;
@@ -559,11 +578,7 @@ public class Cena implements GLEventListener, KeyListener {
 
     private void reset(boolean inicio) {
 
-        if (inicio) {
-            INICIO = true;
-        } else {
-            INICIO = false;
-        }
+        INICIO = inicio;
 
         PAUSE = false;
 
@@ -673,9 +688,6 @@ public class Cena implements GLEventListener, KeyListener {
                     BASTAO_PONTA_DIREITA = BASTAO_X2 + (MOVE_BASTAO_X);
                 }
                 break;
-            case KeyEvent.VK_TAB:
-                opcao = 1;
-                break;
             case KeyEvent.VK_ENTER:
                 opcao = 2;
                 break;
@@ -687,16 +699,13 @@ public class Cena implements GLEventListener, KeyListener {
                     opcao = 2;
                 }
                 break;
-            case KeyEvent.VK_V:
-                opcao = 0;
-                break;
         }
     }
    
     public void iluminacaoEspecular(GL2 gl){        
-        float luzAmbiente[] = {0.2f, 0.2f, 0.2f, 1.0f}; //cor
-        float luzEspecular[]={1.0f, 1.0f, 1.0f, 1.0f}; //cor
-        float posicaoLuz[]={-50.f, 0.0f, 100.0f, 1.0f}; //pontual
+        float[] luzAmbiente = {0.2f, 0.2f, 0.2f, 1.0f}; //cor
+        float[] luzEspecular ={1.0f, 1.0f, 1.0f, 1.0f}; //cor
+        float[] posicaoLuz ={-50.f, 0.0f, 100.0f, 1.0f}; //pontual
              
         //intensidade da reflexao do material        
         int especMaterial = 128;
