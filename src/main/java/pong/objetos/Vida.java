@@ -18,7 +18,7 @@ public class Vida {
 
     public void desenhaVida(GL2 gl, GLUT glut, float incr) {
         gl.glPushMatrix();
-        gl.glColor3f(1, 1, 1); // Cor branca para a vida
+        gl.glColor3f(1, 1, 1);
 
         gl.glPushMatrix();
         float POSICAO_VIDA_ESQ_X = 0.5f;
@@ -37,14 +37,12 @@ public class Vida {
         gl.glEnd();
 
         gl.glPopMatrix();
-
-        // Desenhar os olhos da vida (pontos pretos)
         gl.glPushMatrix();
         gl.glTranslatef(POSICAO_VIDA_ESQ_X + incr, POSICAO_VIDA_ESQ_Y + tamanho * 1.3f, POSICAO_VIDA_Z);
 
         float tamanhoOlho = tamanho * 0.2f;
 
-        gl.glColor3f(0, 0, 0); // Cor preta para os olhos
+        gl.glColor3f(0, 0, 0);
 
         glut.glutSolidSphere(tamanhoOlho, 10, 10);
 
