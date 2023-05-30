@@ -19,10 +19,7 @@ public class   Renderer {
         GLProfile profile = GLProfile.get(GLProfile.GL2);
         GLCapabilities caps = new GLCapabilities(profile);
         window = GLWindow.create(caps);
-        window.setFullscreen(false);
-
-//        window.setSize(screenWidth, screenHeight);
-//		 window.setResizable(false);
+        window.setFullscreen(true);
 
         Cena cena = new Cena();
         window.addGLEventListener(cena); // adiciona a Cena a Janela
