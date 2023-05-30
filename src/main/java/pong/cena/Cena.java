@@ -64,7 +64,7 @@ public class Cena implements GLEventListener, KeyListener {
         switch (tela.getOpcao()) {
             case 0:
                tela.setMenu(new Menu());
-               tela.getMenu().start();
+               tela.getMenu().start(gl);
                break;
             case 2:
                 tela.setMenu(new Menu());
