@@ -8,7 +8,7 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import pong.cena.Cena;
 
-public class Renderer {
+public class   Renderer {
     private static GLWindow window = null;
     public static int screenWidth = 600;
     public static int screenHeight = 600;
@@ -20,9 +20,6 @@ public class Renderer {
         GLCapabilities caps = new GLCapabilities(profile);
         window = GLWindow.create(caps);
         window.setFullscreen(true);
-
-//        window.setSize(screenWidth, screenHeight);
-//		 window.setResizable(false);
 
         Cena cena = new Cena();
         window.addGLEventListener(cena); // adiciona a Cena a Janela
