@@ -4,6 +4,9 @@ Este repositório contém o código-fonte do jogo Pong, desenvolvido utilizando 
 # Autores
 
 João Paulo Sillos Pereira - 125111346583
+
 Henrique Adelaide de Souza - 125111350828
+
 Patrick Amaro Barbosa - 125111375168
+
 Natan Melo Pereira - 125111350828
